@@ -1,0 +1,77 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: ${{ steps.cloudfront.outputs.cloudfront_url }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install -g yarn && yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: eu-west-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
+
+      - name: Replace Tokens with Environment Variables
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/*.tfvars.tmpl"]'
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          FE_BUCKET_NAME: ${{vars.FE_BUCKET_NAME}}
+          CLOUDFRONT_PRICE_CLASS: ${{vars.CLOUDFRONT_PRICE_CLASS}}
+          CLOUDFRONT_CACHE_POLICY_ID: ${{vars.CLOUDFRONT_CACHE_POLICY_ID}}
+          TF_ORGANISATION: ${{secrets.TF_ORGANISATION}}
+          TF_WORKSPACE: ${{secrets.TF_WORKSPACE}}
+
+      - name: Rename .tfvars.tmpl to .tfvars
+        run: |
+          find . -name "*.tfvars.tmpl" -exec sh -c 'mv "$1" "${1%.tmpl}"' _ {} \;
+
+      - name: Terraform Init
+        shell: bash
+        run: terraform -chdir=terraform init
+
+      - name: Terraform Apply
+        run: terraform -chdir=terraform apply -auto-approve
+
+      - name: Sync files to S3
+        run: |
+          aws s3 sync dist/ s3://$(terraform -chdir=terraform output -json | jq -r '.s3_bucket_name.value')
+
+      - name: Invalidate Cloudfront
+        run: |
+          echo "Invalidating Cloudfront"
+          aws cloudfront create-invalidation --distribution-id $(terraform -chdir=terraform output -json | jq -r '.cloudfront_distribution_id.value') --paths "/*"
+
+      - name: Cloudfront URL
+        id: cloudfront
+        run: |
+          export cloudfront_website=$(terraform -chdir=terraform output -json | jq -r '.cloudfront_website.value')
+          echo "Cloudfront URL: https://$cloudfront_website"
+          echo cloudfront_url="https://$cloudfront_website" >> $GITHUB_OUTPUT
