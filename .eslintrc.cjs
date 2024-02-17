@@ -40,4 +40,9 @@ module.exports = {
 		'simple-import-sort/exports': 2,
 		'simple-import-sort/imports': 2,
 	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	}
 }
