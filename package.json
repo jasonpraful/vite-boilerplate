@@ -1,6 +1,6 @@
 {
 	"name": "@jasonpraful/vite-boilerplate",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"type": "module",
 	"private": false,
 	"author": "Jason Praful <jason.praful@gmail.com>",

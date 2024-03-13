@@ -1,6 +1,24 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended"],
+	"dependencyDashboard": true,
+	"dependencyDashboardLabels": ["dependencies :scroll:"],
+	"rangeStrategy": "bump",
+	"lockFileMaintenance": {
+		"enabled": true,
+		"schedule": ["before 4am on Friday"]
+	},
+	"minimumReleaseAge": "10 days",
+	"internalChecksFilter": "strict",
+	"schedule": ["before 4am on Friday"],
+	"automergeStrategy": "squash",
+	"packageRules": [
+		{
+			"matchUpdateTypes": ["patch", "lockFileMaintenance"],
+			"groupName": "patch updates",
+			"automerge": true,
+			"automergeType": "pr",
+			"platformAutomerge": true
+		}
+	]
 }
