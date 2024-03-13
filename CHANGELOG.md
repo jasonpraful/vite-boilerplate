@@ -1,5 +1,11 @@
 # @jasonpraful/vite-boilerplate
 
+## 0.1.1
+
+### Patch Changes
+
+- update renovate config and readme
+
 ## 0.1.0
 
 ### Minor Changes

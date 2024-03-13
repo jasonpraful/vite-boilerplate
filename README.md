@@ -31,6 +31,13 @@
 ## Getting Started
 
 ```bash
+npx @jasonpraful/scripts
+```
+
+> Feeling adventurous? You can use the following commands to manually setup the
+> project:
+
+```bash
 git clone https://github.com/jasonpraful/vite-boilerplate
 cd vite-boilerplate
 ```
