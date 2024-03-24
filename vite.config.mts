@@ -13,8 +13,10 @@ export default defineConfig({
 		include: ['**/*.test.tsx', '**/*.test.ts'],
 		coverage: {
 			provider: 'istanbul',
-
-			reporter: ['html'],
+			include: ['src/**/*.tsx', 'src/**/*.ts'],
+			exclude: ['src/main.tsx'],
+			reporter: ['html', 'lcov'],
+			reportsDirectory: 'test-results/coverage',
 		},
 	},
 	plugins: [react(), tsconfigPaths()],

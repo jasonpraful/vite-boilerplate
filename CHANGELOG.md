@@ -1,5 +1,11 @@
 # @jasonpraful/vite-boilerplate
 
+## 0.1.2
+
+### Patch Changes
+
+- update pre-merge scripts
+
 ## 0.1.1
 
 ### Patch Changes
