@@ -89,7 +89,7 @@
 		"vitest": "^1.4.0"
 	},
 	"engines": {
-		"node": ">=18.19.1"
+		"node": ">=18.20.3"
 	},
 	"optionalDependencies": {
 		"@rollup/rollup-linux-x64-gnu": "^4.13.2"
